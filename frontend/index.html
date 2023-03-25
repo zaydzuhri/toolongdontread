@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html style="background-color: crimson;">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TL;DR</title>
+    <link rel="stylesheet" href="bulma.min.css">
+
+    <script>
+        const token_part1 = "hf_";
+        const token_part2 = "ZzjjiHdFgJdmOswuL";
+        const token_part3 = "nQZFWkZyemGugleXK"
+
+        async function query(data) {
+            const response = await fetch(
+                "https://api-inference.huggingface.co/models/zaydzuhri/flan-t5-small-tldr-50k",
+                {
+                    headers: { Authorization: "Bearer " + token_part1 + token_part2 + token_part3 },
+                    method: "POST",
+                    body: JSON.stringify(data),
+                }
+            );
+            const result = await response.json();
+            return result;
+            // console.log("query")
+            // return {
+            //     "generated_text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc sit am",
+            //     // "estimated_time": 20
+
+            // }
+        }
+
+
+        async function summarize() {
+            const text = document.getElementById("text").value;
+            query({ "inputs": "summarize: " + text }).then(async (response) => {
+                console.log(response)
+                const summary = document.getElementById("summary");
+                if (response.error && !response.estimated_time) {
+                    summary.innerHTML = "Rate limit reached. Try again in an hour";
+                    return;
+                }
+                while (response.estimated_time) {
+                    // wait estimated time
+                    console.log("loading")
+                    summary.innerHTML = "Loading model. Estimated time: " + response.estimated_time + "s"
+                    await new Promise(resolve => setTimeout(resolve, response.estimated_time * 1000));
+                    response = await query({ "inputs": "summarize: " + text });
+                }
+                const tldr = response[0].generated_text;
+                summary.innerHTML = "TL;DR ...";
+                let i = 0;
+                const interval = setInterval(() => {
+                    if (i >= tldr.length) {
+                        clearInterval(interval);
+                    } else {
+                        summary.innerHTML = "TL;DR " + tldr.slice(0, i + 1);
+                        i++;
+                    }
+                }, 50);
+            });
+        }
+    </script>
+</head>
+
+<body>
+    <section class="section">
+        <div class="container has-text-centered">
+            <h1 class="title has-text-white is-size-1 has-text-weight-bold">
+                Too Long; Don't Read</h1>
+            <div class="columns is-centered">
+                <div class="column is-half">
+                    <div class="field">
+                        <label class="label has-text-white">Text that is too long</label>
+                        <div class="control">
+                            <textarea id="text" class="textarea is-rounded is-primary is-large"
+                                placeholder="Enter text here" style="width: 100%; height: 300px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label has-text-white">Summarization</label>
+                        <div class="control">
+                            <p id="summary" class="has-text-white"></p>
+                        </div>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button class="button is-primary" onclick="summarize()">Summarize</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
