@@ -5,6 +5,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TL;DR</title>
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤓</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="bulma.min.css">
     <script>
@@ -26,12 +28,13 @@
         }
 
         async function error(message) {
-            const error = document.getElementById("error-message");
+            const error = document.getElementById("error");
+            const errorMessage = document.getElementById("error-message");
             error.classList.remove("is-hidden");
             error.querySelector(".delete").addEventListener("click", () => {
                 error.classList.add("is-hidden");
             });
-            error.querySelector("p").innerHTML = message;
+            errorMessage.innerHTML = message;
         }
 
         async function summarize() {
@@ -102,10 +105,10 @@
                 </div>
             </div>
         </div>
-        <div id="error-message" class="notification mb-0 mr-4 is-danger is-hidden"
+        <div id="error" class="notification mb-0 mr-4 is-danger is-hidden"
             style="position: fixed; bottom: 3rem; right: 1rem;">
             <button class="delete"></button>
-            An error occurred while processing.
+            <div id="error-message">An error occurred.</div>
         </div>
         <footer class="footer p-0 pb-3"
             style="background-color: #ff6a5f; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%)">
