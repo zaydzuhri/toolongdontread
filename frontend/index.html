@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html style="background-color: crimson;">
+<html style="height: 100%;">
 
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>TL;DR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link rel="stylesheet" href="bulma.min.css">
-
     <script>
         const token_part1 = "hf_";
         const token_part2 = "ZzjjiHdFgJdmOswuL";
@@ -23,39 +23,44 @@
             );
             const result = await response.json();
             return result;
-            // console.log("query")
-            // return {
-            //     "generated_text": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed euismod, nunc sit am",
-            //     // "estimated_time": 20
-
-            // }
         }
 
+        async function error(message) {
+            const error = document.getElementById("error-message");
+            error.classList.remove("is-hidden");
+            error.querySelector(".delete").addEventListener("click", () => {
+                error.classList.add("is-hidden");
+            });
+            error.querySelector("p").innerHTML = message;
+        }
 
         async function summarize() {
             const text = document.getElementById("text").value;
+            const arrow = document.getElementById("arrow-icon");
+            const retry = document.getElementById("retry-icon");
+            arrow.classList.add("is-hidden");
+            retry.classList.remove("is-hidden");
             query({ "inputs": "summarize: " + text }).then(async (response) => {
-                console.log(response)
                 const summary = document.getElementById("summary");
                 if (response.error && !response.estimated_time) {
-                    summary.innerHTML = "Rate limit reached. Try again in an hour";
+                    error("Rate limit reached. Try again in an hour")
                     return;
                 }
                 while (response.estimated_time) {
                     // wait estimated time
-                    console.log("loading")
-                    summary.innerHTML = "Loading model. Estimated time: " + response.estimated_time + "s"
+                    error("Loading model. Estimated time: " + response.estimated_time + "s")
                     await new Promise(resolve => setTimeout(resolve, response.estimated_time * 1000));
                     response = await query({ "inputs": "summarize: " + text });
                 }
                 const tldr = response[0].generated_text;
-                summary.innerHTML = "TL;DR ...";
+                summary.value = "TL;DR ...";
                 let i = 0;
                 const interval = setInterval(() => {
                     if (i >= tldr.length) {
                         clearInterval(interval);
                     } else {
-                        summary.innerHTML = "TL;DR " + tldr.slice(0, i + 1);
+                        summary.value = "TL;DR " + tldr.slice(0, i + 1);
+                        summary.size = i + 1;
                         i++;
                     }
                 }, 50);
@@ -64,35 +69,68 @@
     </script>
 </head>
 
-<body>
-    <section class="section">
+<body style="background-color: #ff6a5f; height: 100%; overflow: hidden;">
+    <section class="section" style="min-height: calc(100% - 10rem);">
         <div class="container has-text-centered">
-            <h1 class="title has-text-white is-size-1 has-text-weight-bold">
+            <h1 class="title has-text-white is-size-1 has-text-weight-bold mb-5">
                 Too Long; Don't Read</h1>
+            <label class="label has-text-white mb-5">AI-powered TL;DR generator</label>
             <div class="columns is-centered">
-                <div class="column is-half">
+                <div class="column is-two-thirds">
                     <div class="field">
-                        <label class="label has-text-white">Text that is too long</label>
+                        <label class="label is-size-5 has-text-white"></label>
                         <div class="control">
-                            <textarea id="text" class="textarea is-rounded is-primary is-large"
-                                placeholder="Enter text here" style="width: 100%; height: 300px;"></textarea>
+                            <textarea id="text" class="textarea is-rounded is-medium"
+                                placeholder="Text that is way too long" style="width: 100%;"></textarea>
                         </div>
                     </div>
-                    <div class="field">
-                        <label class="label has-text-white">Summarization</label>
+                    <label class="label is-size-5 has-text-white mt-5">I don't want to read all that!</label>
+                    <div class="field has-addons has-addons-centered">
                         <div class="control">
-                            <p id="summary" class="has-text-white"></p>
+                            <input class="input is-size-5" id="summary" type="text" size="5" style="font-weight: 500;"
+                                value="TL;DR" readonly>
                         </div>
-                    </div>
-                    <div class="field">
                         <div class="control">
-                            <button class="button is-primary" onclick="summarize()">Summarize</button>
+                            <button class="button is-size-5 is-dark" onclick="summarize()">
+                                <span class="icon is-small">
+                                    <i id="arrow-icon" class="fa fa-arrow-right"></i>
+                                    <i id="retry-icon" class="fa fa-rotate-right is-hidden"></i>
+                                </span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <div id="error-message" class="notification mb-0 mr-4 is-danger is-hidden"
+            style="position: fixed; bottom: 3rem; right: 1rem;">
+            <button class="delete"></button>
+            An error occurred while processing.
+        </div>
+        <footer class="footer p-0 pb-3"
+            style="background-color: #ff6a5f; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%)">
+            <div class="content has-text-centered has-text-white">
+                <p class="mb-1">This summarizer uses a fine-tuned flan-t5-small model</p>
+                <a href="https://github.com/zaydzuhri/toolongdontread">
+                    <span class="icon">
+                        <i class="fa fa-github mr-2" style="font-size: 32px; color: white;"></i>
+                    </span>
+                </a>
+                <a href="https://huggingface.co/zaydzuhri/flan-t5-small-tldr-50k" style="font-size: 28px;">🤗</a>
+            </div>
+        </footer>
     </section>
 </body>
+<style>
+    #text {
+        height: 50px;
+    }
+
+    @media screen and (min-width: 769px) {
+        #text {
+            height: 300px;
+        }
+    }
+</style>
 
 </html>
