@@ -105,13 +105,8 @@
                 </div>
             </div>
         </div>
-        <div id="error" class="notification mb-0 mr-4 is-danger is-hidden"
-            style="position: fixed; bottom: 3rem; right: 1rem;">
-            <button class="delete"></button>
-            <div id="error-message">An error occurred.</div>
-        </div>
-        <footer class="footer p-0 pb-3"
-            style="background-color: #ff6a5f; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%)">
+        <footer class="footer p-0 pb-3 m-0"
+            style="background-color: transparent; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%)">
             <div class="content has-text-centered has-text-white">
                 <p class="mb-1">This summarizer uses a fine-tuned flan-t5-small model</p>
                 <a href="https://github.com/zaydzuhri/toolongdontread">
@@ -123,6 +118,11 @@
             </div>
         </footer>
     </section>
+    <div id="error" class="notification mb-0 mx-5 is-danger is-hidden"
+        style="position: fixed; bottom: 3rem; right: 1rem; z-index: 3; margin-left: 2rem;">
+        <button class="delete"></button>
+        <div id="error-message">An error occurred.</div>
+    </div>
 </body>
 <style>
     #text {
