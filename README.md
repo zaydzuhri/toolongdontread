@@ -1,11 +1,11 @@
 # Too Long; Don't Read
-> # [toolongdontread.live](https://toolongdontread.live)  
+# [toolongdontread.live](https://toolongdontread.live)  
 
 ![Screenshot](/frontend/screenshot.png "Screenshot")
 
 ## Introduction
 
-This is a text summarizer web app that is attached to a large language model, specifically flan-t5-small, fine-tuned to generate short TL;DR summaries of any text.
+This is a text summarizer web app that is attached to a large language model, specifically flan-t5-base, fine-tuned to generate short TL;DR summaries of any text.
 
 ## Training
 [Huggingface🤗 Repository](https://huggingface.co/zaydzuhri/flan-t5-base-tldr-100k)  
